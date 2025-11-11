@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useRef, useState } from "react";
 import "./newUser.css";
 
-const ROLES = ["admin", "lead", "guest"];
+const ROLES = ["admin", "lead", "assignee"];
 const API_BASE = process.env.SERVER_API || "";
 
 
@@ -23,7 +23,7 @@ export default function NewUser() {
   const [errText, setErrText] = useState("");
 
   const [draftName, setDraftName] = useState("");
-  const [draftRole, setDraftRole] = useState("guest");
+  const [draftRole, setDraftRole] = useState("assignee");
 
 
   const dragItem = useRef(null);
@@ -73,7 +73,7 @@ export default function NewUser() {
       if (!resp.ok) throw new Error(`POST ${API_BASE}/api/users ${resp.status}`);
       await loadUsers();
       setDraftName("");
-      setDraftRole("guest");
+      setDraftRole("assignee");
     } catch (e) {
       setErrText(e?.message || "Failed to add user.");
       await loadUsers();
@@ -142,7 +142,7 @@ export default function NewUser() {
     const tgt = dragOver.current;
     if (!src || !tgt || !tgt.role) return null;
 
-    const grouped = { admin: [], lead: [], guest: [] };
+    const grouped = { admin: [], lead: [], assignee: [] };
     for (const r of rows) grouped[r.role].push(r);
 
     const sourceArr = grouped[src.role];
@@ -160,7 +160,7 @@ export default function NewUser() {
     }
     targetArr.splice(insertAt, 0, { ...item, role: tgt.role, id: `${tgt.role}:${item.name.toLowerCase()}` });
 
-    const nextRows = [...grouped.admin, ...grouped.lead, ...grouped.guest];
+    const nextRows = [...grouped.admin, ...grouped.lead, ...grouped.assignee];
     return { nextRows, toRole: tgt.role, insertAt, name: item.name };
   }
   async function finalizeDrop() {
@@ -192,7 +192,7 @@ export default function NewUser() {
   }
 
   const byRole = useMemo(() => {
-    const map = { admin: [], lead: [], guest: [] };
+    const map = { admin: [], lead: [], assignee: [] };
     for (const r of rows) map[r.role]?.push(r);
     for (const k of ROLES) map[k].sort((a, b) => a.name.localeCompare(b.name));
     return map;

@@ -30,28 +30,28 @@ function getOrCreateDraftId() {
 export default function Header() {
   const navigate = useNavigate();
 
-  const [role, setRole] = useState(() => (localStorage.getItem("role") || "guest").toLowerCase());
+  const [role, setRole] = useState(() => (localStorage.getItem("role") || "assignee").toLowerCase());
   const [name, setName] = useState(() => localStorage.getItem("name") || "");
-  const [users, setUsers] = useState({ admin: [], lead: [], guest: [] });
+  const [users, setUsers] = useState({ admin: [], lead: [], assignee: [] });
 
   useEffect(() => {
     let alive = true;
     (async () => {
       try {
         const resp = await fetch(`${API_BASE}/api/users`, { credentials: "include" });
-        const data = resp.ok ? await resp.json() : { admin: [], lead: [], guest: [] };
+        const data = resp.ok ? await resp.json() : { admin: [], lead: [], assignee: [] };
 
-        const extraGuests = ["Sam Guest", "Taylor Guest"];
+        const extraassignees = ["Sam assignee", "Taylor assignee"];
         const admins = (data.admin || []).map((s) => String(s).trim()).filter(Boolean);
         const leads = (data.lead || []).map((s) => String(s).trim()).filter(Boolean);
-        const guestSet = new Set([...(data.guest || []), ...extraGuests].map((s) => String(s).trim()).filter(Boolean));
-        const guests = Array.from(guestSet);
+        const assigneeSet = new Set([...(data.assignee || []), ...extraassignees].map((s) => String(s).trim()).filter(Boolean));
+        const assignees = Array.from(assigneeSet);
 
         if (!alive) return;
-        setUsers({ admin: admins, lead: leads, guest: guests });
+        setUsers({ admin: admins, lead: leads, assignee: assignees });
       } catch {
         if (!alive) return;
-        setUsers({ admin: [], lead: [], guest: ["Sam Guest", "Taylor Guest"] });
+        setUsers({ admin: [], lead: [], assignee: ["Sam assignee", "Taylor assignee"] });
       }
     })();
     return () => {
@@ -63,7 +63,7 @@ export default function Header() {
     const opts = [];
     if (users.admin?.[0]) opts.push({ role: "admin", label: `Admin — ${users.admin[0]}`, name: users.admin[0] });
     if (users.lead?.[0]) opts.push({ role: "lead", label: `Lead — ${users.lead[0]}`, name: users.lead[0] });
-    if (users.guest?.[0]) opts.push({ role: "guest", label: `Guest — ${users.guest[0]}`, name: users.guest[0] });
+    if (users.assignee?.[0]) opts.push({ role: "assignee", label: `assignee — ${users.assignee[0]}`, name: users.assignee[0] });
     return opts;
   }, [users]);
 

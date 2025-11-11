@@ -13,13 +13,13 @@ export default function EditProject() {
   const [changed, setChanged] = useState([]);
   const [loading, setLoading] = useState(true);
   const [depDraft, setDepDraft] = useState({});
-  const [userRoles, setUserRoles] = useState({ guest: [], lead: [], admin: [] });
+  const [userRoles, setUserRoles] = useState({ assignee: [], lead: [], admin: [] });
 
   const signedInName = (localStorage.getItem("username") || localStorage.getItem("name") || "").trim();
   const role = (localStorage.getItem("role") || "").trim().toLowerCase();
 
   useEffect(() => {
-    if (role === "guest") navigate("/");
+    if (role === "assignee") navigate("/");
   }, [role, navigate]);
 
   useEffect(() => {
@@ -29,7 +29,7 @@ export default function EditProject() {
         if (!res.ok) throw new Error("Failed to fetch users");
         const data = await res.json();
         setUserRoles({
-          guest: (data.guest || []).map(String),
+          assignee: (data.assignee || []).map(String),
           lead: (data.lead || []).map(String),
           admin: (data.admin || []).map(String),
         });
@@ -159,7 +159,7 @@ export default function EditProject() {
         task: "",
         status: "IN_PROGRESS",
         priority: "Low",
-        lead: role === "admin" ? (userRoles.lead[0] || userRoles.guest[0] || "") : (userRoles.guest[0] || ""),
+        lead: role === "admin" ? (userRoles.lead[0] || userRoles.assignee[0] || "") : (userRoles.assignee[0] || ""),
         assigned: signedInName || "",
         dependsOn: [],
         startDate: "",
@@ -236,8 +236,8 @@ export default function EditProject() {
 
   const leadOptions =
     role === "admin"
-      ? [...(userRoles.admin || []), ...(userRoles.lead || []), ...(userRoles.guest || [])]
-      : [...(userRoles.guest || [])];
+      ? [...(userRoles.admin || []), ...(userRoles.lead || []), ...(userRoles.assignee || [])]
+      : [...(userRoles.assignee || [])];
 
   return (
     <div className="todo-container">
@@ -306,7 +306,7 @@ export default function EditProject() {
                   </select>
                 </td>
 
-                {/* Lead ComboBox (editable for admins & leads; leads only see Guests) */}
+                {/* Lead ComboBox (editable for admins & leads; leads only see assignees) */}
                 <td>
                   <select
                     className="dropdown"

@@ -95,7 +95,7 @@ export default function ToDoList() {
   const navigate = useNavigate();
 
   const [localRole, setRole] = useState(
-    () => (localStorage.getItem("role") || "guest").toLowerCase()
+    () => (localStorage.getItem("role") || "assignee").toLowerCase()
   );
 
   const whoAmI = useMemo(
@@ -214,7 +214,7 @@ export default function ToDoList() {
   }, []);
 
   const filtered = useMemo(() => {
-    const role = (localRole || "guest").toLowerCase();
+    const role = (localRole || "assignee").toLowerCase();
     if (role === "admin" || role === "owner") return tasks;
     if (role === "lead") return tasks.filter((t) => isMe(t.lead));
     return tasks.filter((t) => isMe(t.assigned));
@@ -390,9 +390,9 @@ export default function ToDoList() {
                   <td>
                     <select
                       value={t.status}
-                      disabled={localRole === "guest"}
+                      disabled={localRole === "assignee"}
                       onChange={(e) =>
-                        localRole !== "guest" &&
+                        localRole !== "assignee" &&
                         handleChange(t.id, "status", e.target.value)
                       }
                     >
@@ -410,9 +410,9 @@ export default function ToDoList() {
                   <td>
                     <select
                       value={t.priority}
-                      disabled={localRole === "guest"}
+                      disabled={localRole === "assignee"}
                       onChange={(e) =>
-                        localRole !== "guest" &&
+                        localRole !== "assignee" &&
                         handleChange(t.id, "priority", e.target.value)
                       }
                     >
@@ -428,13 +428,13 @@ export default function ToDoList() {
                   <td>
                     <select
                       value={t.assigned || ""}
-                      disabled={localRole === "guest"}
+                      disabled={localRole === "assignee"}
                       onChange={(e) =>
                         handleChange(t.id, "assigned", e.target.value)
                       }
                     >
                       {(localRole === "lead"
-                        ? members.filter((m) => m.role === "guest")
+                        ? members.filter((m) => m.role === "assignee")
                         : members
                       ).map(({ name, role }) => (
                         <option key={`${name}-${role}`} value={name}>
@@ -449,9 +449,9 @@ export default function ToDoList() {
                     <input
                       type="date"
                       value={startVal}
-                      disabled={localRole === "guest"}
+                      disabled={localRole === "assignee"}
                       onChange={(e) => {
-                        if (localRole !== "guest")
+                        if (localRole !== "assignee")
                           return handleChange(t.id, "startDate", e.target.value);
                       }}
                     />
@@ -462,9 +462,9 @@ export default function ToDoList() {
                     <input
                       type="date"
                       value={dueVal}
-                      disabled={localRole === "guest"}
+                      disabled={localRole === "assignee"}
                       onChange={(e) => {
-                        if (localRole !== "guest")
+                        if (localRole !== "assignee")
                           return handleChange(t.id, "dueDate", e.target.value);
                       }}
                     />
