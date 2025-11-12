@@ -70,7 +70,8 @@ Think of it as a **task tree**:
 ## Getting Started
 
 ```bash
-git clone <repository-url>
-cd <project-folder>
+git clone https://github.com/mansoorhash/project-managment.git
+cd "project management"
 npm install
 npm start
+
