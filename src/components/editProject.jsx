@@ -1,5 +1,6 @@
-import React, { useEffect, useMemo, useState } from "react";
+import React, { useCallback, useEffect, useMemo, useState } from "react";
 import { useParams, useNavigate } from "react-router-dom";
+import { FaTrash } from "react-icons/fa";
 import "./taskList.css";
 import "./editProject.css";
 
@@ -206,8 +207,29 @@ export default function EditProject() {
     startDate: t.startDate ?? "-",
     dueDate: t.dueDate ?? "-",
     note: t.note || "-",
-    dependsOn: (t.dependencies || []).map((d) => `${d.targetId}:${d.type || "FS"}`),
+    dependsOn: (t.dependsOn || []).map((d) => `${d.targetId}:${d.type || "FS"}`),
   });
+
+    const handleDeleteTask = useCallback(
+      async (t) => {
+        if (!t) return;
+        const ok = window.confirm(`Delete task "${t.task}" from project "${t.project}"?`);
+        if (!ok) return;
+  
+        try {
+          const res = await fetch(`${API_BASE}/api/tasks/${encodeURIComponent(t.id)}`, {
+            method: "DELETE",
+            credentials: "include",
+          });
+          if (!res.ok) throw new Error(`DELETE failed: ${res.status}`);
+  
+          setTasks((prev) => prev.filter((x) => x.id !== t.id));
+        } catch (e) {
+          console.error("Delete failed:", e);
+          setErrText(e?.message || "Failed to delete task.");
+        }
+      }
+    );
 
   const handleSave = async () => {
     sessionStorage.removeItem("draft_project_taskId");
@@ -257,7 +279,7 @@ export default function EditProject() {
             <th>#</th>
             <th>Task Name</th>
             <th>Priority</th>
-            <th>Lead</th>
+            <th>Assigned to</th>
             <th>Dependencies</th>
             <th>Start Date</th>
             <th>Due Date</th>
@@ -271,7 +293,13 @@ export default function EditProject() {
 
             return (
               <tr key={t.id}>
-                <td>{t.number}</td>
+                <td>
+                  <span>{t.number}</span>
+                  <FaTrash
+                    style={{ cursor: "pointer", color: "red", marginLeft: "8px" }}
+                    onClick={() => handleDeleteTask(t)}
+                  />
+                </td>
 
                 <td>
                   <input
@@ -310,10 +338,9 @@ export default function EditProject() {
                 <td>
                   <select
                     className="dropdown"
-                    value={t.lead || ""}
+                    value={t.assigned || ""}
                     onChange={(e) => handleTaskChange(index, "lead", e.target.value)}
                   >
-                    <option value="">Select Lead</option>
                     {leadOptions.map((u) => (
                       <option key={u} value={u}>
                         {u}
@@ -325,7 +352,7 @@ export default function EditProject() {
                 {/* Dependencies */}
                 <td>
                   <div>
-                    {(t.dependencies || []).map((d, di) => (
+                    {t.dependsOn.map((d, di) => (
                       <span
                         key={`${d.type}-${d.targetId}-${di}`}
                         style={{

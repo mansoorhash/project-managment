@@ -5,13 +5,15 @@
     "project": "Project 1",
     "task": "Task 1",
     "status": "IN_PROGRESS",
-    "priority": "Low",
+    "priority": "High",
     "assigned": "Sam Guest",
-    "lead": "Sam Guest",
+    "lead": "max",
     "startDate": "2025-10-28",
     "dueDate": "2025-11-16",
     "note": "-",
-    "dependsOn": []
+    "dependsOn": [
+      "f65bc605-13fc-487d-8363-f4574ee76db5:SS"
+    ]
   },
   {
     "id": "f65bc605-13fc-487d-8363-f4574ee76db5",
@@ -21,7 +23,7 @@
     "status": "IN_PROGRESS",
     "priority": "Low",
     "assigned": "Sam Guest",
-    "lead": "Sam Guest",
+    "lead": "max",
     "startDate": "2025-11-07",
     "dueDate": "2025-11-12",
     "note": "-",

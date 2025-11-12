@@ -9,7 +9,6 @@ html, body {
 
 .todo-container {
   width: 100%;
-  max-width: 100%;
   margin: 0;
   padding: 20px 30px;
   background-color: #f9f9f9;
@@ -42,14 +41,14 @@ html, body {
 }
 
 .todo-table th {
-  background-color: #c6e1ff;
+  background-color: #0076fd;
   color: white;
   font-weight: 600;
   text-align: left;
   padding: 10px;
   font-size: 0.95rem;
-  border-top-left-radius: 5px;
-  border-top-right-radius: 5px;
+  border-top-left-radius: 10px;
+  border-top-right-radius: 10px;
 }
 
 .todo-table th:first-child {
@@ -146,3 +145,12 @@ button:disabled {
   font-size: 0.85rem;
 }
 
+.delete-icon {
+  cursor: pointer;
+  color: #999;
+  transition: color 0.2s;
+}
+
+.delete-icon:hover {
+  color: red;
+}

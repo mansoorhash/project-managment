@@ -113,6 +113,7 @@ export default function Gantt() {
   const [tasks, setTasks] = useState([]);
   const [loading, setLoading] = useState(false);
   const [errText, setErrText] = useState("");
+  const role = localStorage.getItem("role");
 
   // Filters
   const [filters, setFilters] = useState({
@@ -249,7 +250,6 @@ export default function Gantt() {
           {cursor.from.toLocaleDateString(undefined, { month: "long", year: "numeric" })}
         </div>
 
-        {loading && <span className="gantt__status">Loading…</span>}
         {errText && <span className="gantt__status gantt__status--err">{errText}</span>}
       </div>
 
@@ -294,7 +294,7 @@ export default function Gantt() {
             </select>
           </label>
 
-          <label className="gantt__filterrow">
+          {role !== "assignee" && <label className="gantt__filterrow">
             <span>Assigned</span>
             <select
               className="gantt__select"
@@ -307,7 +307,7 @@ export default function Gantt() {
                 </option>
               ))}
             </select>
-          </label>
+          </label>}
 
           <label className="gantt__filterrow">
             <span>Status</span>
@@ -331,69 +331,89 @@ export default function Gantt() {
 
 
         <div className="gantt__right" ref={rightRef}>
-          {todayPct !== null && <div className="gantt__todayline" style={{ left: `${todayPct}%` }} aria-hidden="true" />}
-
-          {/* dependency links */}
-          <svg className="gantt__links" width={svgSize.w} height={svgSize.h} viewBox={`0 0 ${svgSize.w} ${svgSize.h}`} aria-hidden="true">
-            <defs>
-              <marker id="arrow" viewBox="0 0 8 8" refX="8" refY="4" markerWidth="8" markerHeight="8" orient="auto">
-                <path d="M0,0 L8,4 L0,8 z" fill="#9ca3af" />
-              </marker>
-            </defs>
-            {links.map((lnk, i) => {
-              const { fromPct, toPct } = anchorByType(lnk.type, lnk.from, lnk.to);
-              const x1 = (fromPct / 100) * svgSize.w;
-              const x2 = (toPct / 100) * svgSize.w;
-              const y1 = 8 + lnk.from.row * (36 + 8) + 18;
-              const y2 = 8 + lnk.to.row   * (36 + 8) + 18;
-              const midX = x1 + (x2 >= x1 ? 12 : -12);
-              const cls =
-                lnk.type === "SS" ? "glnk glnk--ss" :
-                lnk.type === "FF" ? "glnk glnk--ff" :
-                lnk.type === "SF" ? "glnk glnk--sf" :
-                "glnk glnk--fs";
-              return (
-                <path
-                  key={i}
-                  className={cls}
-                  d={`M ${x1} ${y1} L ${midX} ${y1} L ${midX} ${y2} L ${x2} ${y2}`}
-                  fill="none"
-                  markerEnd="url(#arrow)"
+          {loading ? (
+            <span className="gantt__status">Loading…</span>
+          ) : rows.length === 0 ? (
+            <div className="gantt__empty">No tasks match the filters for this month.</div>
+          ) : (
+            <>
+              {todayPct !== null && (
+                <div
+                  className="gantt__todayline"
+                  style={{ left: `${todayPct}%` }}
+                  aria-hidden="true"
                 />
-              );
-            })}
-          </svg>
+              )}
 
-          {/* vertical day grid */}
-          <div className="gantt__cols">
-            {buildDayScale(cursor.from, cursor.to).map((_, i) => <div key={i} className="gantt__col" />)}
-          </div>
+              {/* dependency links */}
+              <svg
+                className="gantt__links"
+                width={svgSize.w}
+                height={svgSize.h}
+                viewBox={`0 0 ${svgSize.w} ${svgSize.h}`}
+                aria-hidden="true"
+              >
+                <defs>
+                  <marker id="arrow" viewBox="0 0 8 8" refX="8" refY="4" markerWidth="8" markerHeight="8" orient="auto">
+                    <path d="M0,0 L8,4 L0,8 z" fill="#9ca3af" />
+                  </marker>
+                </defs>
+                {links.map((lnk, i) => {
+                  const { fromPct, toPct } = anchorByType(lnk.type, lnk.from, lnk.to);
+                  const x1 = (fromPct / 100) * svgSize.w;
+                  const x2 = (toPct / 100) * svgSize.w;
+                  const y1 = 8 + lnk.from.row * (36 + 8) + 18;
+                  const y2 = 8 + lnk.to.row * (36 + 8) + 18;
+                  const midX = x1 + (x2 >= x1 ? 12 : -12);
+                  const cls =
+                    lnk.type === "SS" ? "glnk glnk--ss" :
+                    lnk.type === "FF" ? "glnk glnk--ff" :
+                    lnk.type === "SF" ? "glnk glnk--sf" :
+                    "glnk glnk--fs";
+                  return (
+                    <path
+                      key={i}
+                      className={cls}
+                      d={`M ${x1} ${y1} L ${midX} ${y1} L ${midX} ${y2} L ${x2} ${y2}`}
+                      fill="none"
+                      markerEnd="url(#arrow)"
+                    />
+                  );
+                })}
+              </svg>
 
-          {/* bars */}
-          <div className="gantt__rows">
-            {rows.map((row, rIdx) => {
-              const t = row[0];
-              const leftPct = dateToPct(t.start, cursor.from, cursor.to);
-              const rightPct = dateToPct(t.end, cursor.from, cursor.to);
-              const widthPct = Math.max(0.5, rightPct - leftPct || 0.5);
-              const title = `${t.title} (${ymd(t.start)} → ${ymd(t.end)})`;
-              return (
-                <div key={rIdx} className="gantt__row">
-                  <div
-                    className={`gantt__bar gantt__bar--${statusMod(t.status)}`}
-                    title={title}
-                    style={{ left: `${leftPct}%`, width: `${widthPct}%` }}
-                  >
-                    <span className="gantt__barlabel">{t.title}</span>
-                  </div>
-                </div>
-              );
-            })}
-            {rows.length === 0 && (
-              <div className="gantt__empty">No tasks match the filters for this month.</div>
-            )}
-          </div>
+              {/* vertical day grid */}
+              <div className="gantt__cols">
+                {buildDayScale(cursor.from, cursor.to).map((_, i) => (
+                  <div key={i} className="gantt__col" />
+                ))}
+              </div>
+
+              {/* bars */}
+              <div className="gantt__rows">
+                {rows.map((row, rIdx) => {
+                  const t = row[0];
+                  const leftPct = dateToPct(t.start, cursor.from, cursor.to);
+                  const rightPct = dateToPct(t.end, cursor.from, cursor.to);
+                  const widthPct = Math.max(0.5, rightPct - leftPct || 0.5);
+                  const title = `${t.title} (${ymd(t.start)} → ${ymd(t.end)})`;
+                  return (
+                    <div key={rIdx} className="gantt__row">
+                      <div
+                        className={`gantt__bar gantt__bar--${statusMod(t.status)}`}
+                        title={title}
+                        style={{ left: `${leftPct}%`, width: `${widthPct}%` }}
+                      >
+                        <span className="gantt__barlabel">{t.title}</span>
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            </>
+          )}
         </div>
+
       </div>
     </section>
   );

@@ -72,10 +72,10 @@ function upsertById(existing, changes) {
   return Array.from(byId.values());
 }
 
-const VALID_ROLES = new Set(['admin', 'lead', 'guest']);
+const VALID_ROLES = new Set(['admin', 'lead', 'assignee']);
 
 function emptyBuckets() {
-  return { admin: [], lead: [], guest: [] };
+  return { admin: [], lead: [], assignee: [] };
 }
 
 function sanitizeName(name) {
@@ -199,7 +199,7 @@ app.put('/api/tasks/:projectId', async (req, res) => {
 
 // ---------------- USERS routes (names only + drag & drop) ----------------
 
-// GET roles -> { guest:[string], lead:[string], admin:[string] }
+// GET roles -> { assignee:[string], lead:[string], admin:[string] }
 app.get('/api/users', async (_req, res) => {
   try {
     const data = await readUsersNames();
@@ -214,7 +214,7 @@ app.get('/api/users', async (_req, res) => {
 app.post('/api/users', async (req, res) => {
   try {
     const name = sanitizeName(req.body?.name);
-    const role = sanitizeRole(req.body?.role) || 'guest';
+    const role = sanitizeRole(req.body?.role) || 'assignee';
     if (!name) return res.status(400).json({ error: 'name required' });
 
     const data = await readUsersNames();
@@ -248,7 +248,7 @@ app.put('/api/users/:name', async (req, res) => {
 
     // find original role
     const lower = current.toLowerCase();
-    const roles = ['admin', 'lead', 'guest'];
+    const roles = ['admin', 'lead', 'assignee'];
     let originalRole = roles.find(r => data[r].some(n => n.toLowerCase() === lower));
     if (!originalRole) return res.status(404).json({ error: 'user not found' });
 
@@ -276,7 +276,7 @@ app.patch('/api/users/reorder', async (req, res) => {
   try {
     const role = sanitizeRole(req.body?.role);
     const names = Array.isArray(req.body?.names) ? req.body.names.map(sanitizeName).filter(Boolean) : null;
-    if (!role) return res.status(400).json({ error: 'role must be guest|lead|admin' });
+    if (!role) return res.status(400).json({ error: 'role must be assignee|lead|admin' });
     if (!names) return res.status(400).json({ error: 'names[] required' });
 
     const data = await readUsersNames();
@@ -314,9 +314,9 @@ app.delete('/api/users/:name', async (req, res) => {
     if (!name) return res.status(400).json({ error: 'name param required' });
 
     const data = await readUsersNames();
-    const before = data.admin.length + data.lead.length + data.guest.length;
+    const before = data.admin.length + data.lead.length + data.assignee.length;
     removeFromAll(data, name);
-    const after = data.admin.length + data.lead.length + data.guest.length;
+    const after = data.admin.length + data.lead.length + data.assignee.length;
 
     if (after === before) return res.status(404).json({ error: 'user not found' });
 
