@@ -1,6 +1,6 @@
-# Project Management Tool
+# TaskFlow
 
-A web-based project management application designed to streamline task organization, delegation, and progress tracking across teams. It expands on the simplicity of a to-do list by introducing ownership, task assignment, hierarchical visibility, and multiple visual workflows for monitoring work over time.
+A web-based project management application designed to streamline task organization, delegation, and progress tracking across teams. It expands on the simplicity of a to-do list by introducing ownership, task assignment, hierarchical visibility, and multiple visual workflows for monitoring work over time. Originally created to allow the integration of Microsoft Teams Organization heirarchical structure to be implemented allowing a more dynamic and custom experience compared to current Microsoft applications.
 
 ---
 
@@ -10,7 +10,7 @@ A web-based project management application designed to streamline task organizat
 - View tasks you **created** and tasks **assigned to you**
 - Each task has:
   - **Owner** (creator / responsible party)
-  - **Assignees** (people expected to complete the task or collaborate)
+  - **Assignee** (person expected to complete the task or collaborate)
   - **Dependencies** (FF,SS,FS,SF)
   - **Status**, **due date**, and **priority**
 - Administrators can view and edit tasks across the entire system
@@ -58,21 +58,21 @@ Think of it as a **task tree**:
 ---
 
 ## Technologies Used
-*(Fill in based on your actual stack)*
 
-- **Frontend:** React / JavaScript
-- **Backend:** Node.js (Optional APIs, Auth, DB)
-- **Database:** (MongoDB / PostgreSQL / Firebase / etc.)
-- **UI / Visualization:** (e.g., Recharts, D3, FullCalendar, or custom components)
+- **Frontend:** React, JavaScript, HTML, CSS
+- **Backend:** Node.js
+- **Database:** JSON
+- **UI / Visualization:** Custom React components(Task List, Calendar, Gantt Chart), Fully Custom CSS (no external UI libraries)
 
 ---
 
 ## Getting Started
 
 ```bash
-git clone https://github.com/mansoorhash/project-managment.git
-cd "project management"
+git clone https://github.com/mansoorhash/TaskFlow.git
+cd taskflow
 npm install
 npm start
+
 
 
